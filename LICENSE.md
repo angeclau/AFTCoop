@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2025 ATFCoop authors
+Copyright (c) 2025 ATFCoop Claudia Angelini, Daniela De Canditiis, Italia De Feis, Antonella Iuliano
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
