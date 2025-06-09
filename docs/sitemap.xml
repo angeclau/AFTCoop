@@ -1,0 +1,23 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/reference/aft_coop.html</loc></url>
+<url><loc>/reference/cv.aftcoop_fold.html</loc></url>
+<url><loc>/reference/cv.coop.html</loc></url>
+<url><loc>/reference/generate_data.html</loc></url>
+<url><loc>/reference/gradient.html</loc></url>
+<url><loc>/reference/hessian_coop.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/marginal_ranking.html</loc></url>
+<url><loc>/reference/nll.html</loc></url>
+<url><loc>/reference/plot_aft_coop.cv.html</loc></url>
+<url><loc>/reference/predict_aft_coop.html</loc></url>
+<url><loc>/reference/prox.l1.html</loc></url>
+<url><loc>/reference/proxGD.coop.html</loc></url>
+<url><loc>/reference/standardize.html</loc></url>
+<url><loc>/reference/variable_screening.html</loc></url>
+</urlset>
+
