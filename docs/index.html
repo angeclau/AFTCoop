@@ -42,6 +42,9 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -55,7 +58,34 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-The AFTCoop package estimates cooperative AFT survival regression models that allow the integration of two matrices of covariates, U and Z, to improve the estimate. It implements the direct cooperative algorithm proposed in Angelini, De Canditiis, De Feis and Iuliano (in preparation 2025). It relies on adding a cooperative term into a penalized negative loglikelihood function to enforce the agreement between the two views representing two multi-omics datasets associated to the same patients, such as gene expression and methylation. The cooperative learning is a novel approach to multi-view data integration iniatially proposed in Ding et al (2022). In this setting, the AFT negative loglikeloood and the LASSO penalization are combined to enforce sparsity, and an agreement penalty is used to encourage the predictions from the two data views to agree while improving the survival estimates. The user can choose between three models: Weibull, lognormal, or log-logistic, which handle different noise distributions in the log-linear AFT representation. The regression coefficient estimates are obtained using the proximal gradient method, and the regularization parameter is chosen using cross-validation.
+<div class="section level1">
+<div class="page-header"><h1 id="aftcoop">AFTCoop<a class="anchor" aria-label="anchor" href="#aftcoop"></a>
+</h1></div>
+<p><strong>AFTCoop</strong> is an R package for fitting cooperative AFT survival regression models with two omics views.</p>
+<div class="section level2">
+<h2 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
+</h2>
+<p>The <strong>AFTCoop</strong> package estimates cooperative AFT survival regression models that allow the integration of two matrices of covariates, <strong>U</strong> and <strong>Z</strong>, to improve the estimate. It implements the direct cooperative algorithm proposed in Angelini, De Canditiis, De Feis and Iuliano (in preparation 2025). It relies on adding a cooperative term into a penalized negative log-likelihood function to enforce the agreement between the two views representing two multi-omics datasets associated to the same patients, such as gene expression and methylation. The cooperative learning is a novel approach to multi-view data integration iniatially proposed in Ding et al (2022). In this setting, the AFT negative loglikeloood and the LASSO penalization are combined to enforce sparsity, and an agreement penalty is used to encourage the predictions from the two data views to agree while improving the survival estimates. The user can choose between three models: <em>Weibull</em>, <em>lognormal</em>, or <em>log-logistic</em>, which handle different noise distributions in the log-linear AFT representation. The regression coefficient estimates are obtained using the proximal gradient method, and the regularization parameter is chosen using cross-validation</p>
+</div>
+<div class="section level2">
+<h2 id="test_tube-installation">🧪 Installation<a class="anchor" aria-label="anchor" href="#test_tube-installation"></a>
+</h2>
+<p>For now, install the latest version of <strong>AFTCoop</strong> directly from GitHub:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"angeclau/AFTCoop"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="books-citation">📚 Citation<a class="anchor" aria-label="anchor" href="#books-citation"></a>
+</h2>
+<p>If you use AFTCoop, please cite: 1. C. Angelini, D. De Canditiis, I. De Feis, A. Iuliano. <em>Cooperative AFT models for multi-omics data integration</em> in preparation (2025)</p>
+<div class="section level3">
+<h3 id="id_-funding">🏛 Funding<a class="anchor" aria-label="anchor" href="#id_-funding"></a>
+</h3>
+<p>This work is supported by the PRIN 2022 PNRR P2022BLN38 project, <em>Computational approaches for the integration of multi-omics data</em> funded by European Union - Next Generation EU, CUP <strong>B53D23027810001</strong>.</p>
+</div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
