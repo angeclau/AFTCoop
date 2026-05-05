@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">AFTCoop</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4</span>
       </span>
     </div>
 
@@ -41,6 +41,40 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.4" id="aftcoop-024-development-version-">AFTCoop 0.2.4 (Development Version) :<a class="anchor" aria-label="anchor" href="#aftcoop-024-development-version-"></a></h2>
+<ul><li>Improved functions marginal_ranking.R and variable_screening.R</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.3" id="aftcoop-023-development-version--branched-from-021">AFTCoop 0.2.3 (Development Version) : Branched from 0.2.1<a class="anchor" aria-label="anchor" href="#aftcoop-023-development-version--branched-from-021"></a></h2>
+<ul><li>To ensure compatibility with R 4.5.2 + Apple Silicon M4.</li>
+</ul><p>we removed: mclapply(…)</p>
+<p>and replaced with: cl &lt;- makeCluster(…); parLapply(…) ; stopCluster(cl)</p>
+<ul><li><p>Now, it uses the same parallel interface without need of swithching on windows.</p></li>
+<li><p>The parallel interface is still based on the use of the library “parallel”.</p></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.2" id="aftcoop-022-development-version">AFTCoop 0.2.2 (Development Version)<a class="anchor" aria-label="anchor" href="#aftcoop-022-development-version"></a></h2>
+<ul><li>To ensure compatibility with R 4.5.2 + Apple Silicon M4.</li>
+</ul><p>We used tryCatch() to handle error message in the parallelism over rho-values and k-fold. Then we force sequential mode in case of errors–&gt; but it becomes slower.</p>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.1" id="aftcoop-021-development-version">AFTCoop 0.2.1 (Development Version)<a class="anchor" aria-label="anchor" href="#aftcoop-021-development-version"></a></h2>
+<ul><li>Modified the logical parameter “parallel” into two logical parameters “parallel_rho” and “parallel_cv”, to better handle parallelism over the vector of rho values and the cross-validation.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.0" id="aftcoop-020-development-version">AFTCoop 0.2.0 (Development Version)<a class="anchor" aria-label="anchor" href="#aftcoop-020-development-version"></a></h2>
+<ul><li><p>Modified the call to the evaluation of the maximun eigenvalue of the Hessian in the main_functions using RSpectra.</p></li>
+<li><p>Corrected some typos in the documentation</p></li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.1.1" id="aftcoop-011-development-version">AFTCoop 0.1.1 (Development Version)<a class="anchor" aria-label="anchor" href="#aftcoop-011-development-version"></a></h2>
+<ul><li>This is the first online version.</li>
+</ul><div class="section level4">
+<h4 id="id_-project-funding-0-1-1">🏛 Project Funding<a class="anchor" aria-label="anchor" href="#id_-project-funding-0-1-1"></a></h4>
+<p>This work is supported by the PRIN 2022 PNRR P2022BLN38 project, <em>Computational approaches for the integration of multi-omics data</em> funded by European Union - Next Generation EU, CUP <strong>B53D23027810001</strong>.</p>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -55,7 +89,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

@@ -46,6 +46,6 @@ The function:
 }
 }
 \note{
-Last change 15/03/2025
+Last change 26/02/2026
 }
 \keyword{internal}

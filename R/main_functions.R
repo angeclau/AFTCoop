@@ -106,7 +106,9 @@ gradient <- function(X, Y, eta, delta, sigma, n, model) {
 #' \itemize{
 #'   \item L: Lipschitz constant (maximum eigenvalue of Hessian)
 #' }
-#' @note Last change 15/03/2025
+#' @import RSpectra
+#'
+#' @note Last change 26/02/2026
 #' @keywords internal
 hessian_coop <- function(X, Y, eta, delta, sigma, rho, lambda, coop, n, model) {
   res <- (Y - eta) / sigma  # Compute residuals once
@@ -126,8 +128,8 @@ hessian_coop <- function(X, Y, eta, delta, sigma, rho, lambda, coop, n, model) {
   )
 
   H <- (1 / n) * crossprod(X, E %*% X) + lambda * (1 - rho) * coop
-  max.eig <- max(eigen(H, only.values = TRUE)$values)  # Get max eigenvalue directly
 
+  max.eig <- RSpectra::eigs_sym(H, 1, which = "LM")$values ## Rspectra is more efficient
   return(list(L = max.eig))  # Return Lipschitz constant
 }
 
@@ -158,7 +160,13 @@ prox.l1 <- function(u, mu) { # mu = lambda*alpha/L
   ubind <- cbind(rep(0, length(u)), uhat)
   prox <- sign(u) * apply(ubind, 1, max)
   return(prox)
+
+### Vectorized form (to speed up)
+  #prox.l1 <- function(u, mu) {
+  #  sign(u) * pmax(abs(u) - mu, 0)
 }
+
+
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ## Matrix standartization

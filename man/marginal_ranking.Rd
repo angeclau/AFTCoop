@@ -10,7 +10,7 @@ marginal_ranking(
   delta,
   family = c("cox", "AFT"),
   model = c("weibull", "exponential", "lognormal", "loglogistic"),
-  rank = c("absmg", "mg", "mgpadj")
+  rank = c("absmg", "mg", "mgpadj", "mgpval")
 )
 }
 \arguments{
@@ -24,22 +24,21 @@ marginal_ranking(
 
 \item{model}{Character string specifying the specific AFT model to use.  It can assume one of the following values: "weibull";"lognormal";"loglogistic". Ignored if \code{family = "cox"}.}
 
-\item{rank}{Character string specifying the ranking method. It can assume one of the following values: "absmg", "mg" and "mgpadj".}
+\item{rank}{Character string specifying the ranking method. It can assume one of the following values: \code{absmg}, \code{mg}, \code{mgpadj} and \code{mgpval}.}
 }
 \value{
 A data frame with the ranked features. The columns include:
 \itemize{
-\item ranking:  The rank of the feature based on the selected method.
-\item symbol: The name of the feature.
-\item rank: The ranked marginal utility values using one of several methods: \code{absmg}, \code{mg}, \code{mgpadj}.
+\item ranking: The rank of the features according to the ranking method.
+\item symbol: The symbol name of the features according to the ranking method.
+\item rank: The rank methods: \code{absmg}, \code{mg}, \code{mgpadj}, \code{mgpval}.
 }
 }
 \description{
 This function performs marginal ranking of features based on their association with the survival outcome
 (see, for example, Fan and Lv (2008) and Fan, Feng and Wu (2010)).
-Specifically, it computes the marginal coefficient for each feature in the dataset and s
-orts the covariates in decreasing order according to the selected ranking method:
-\code{absmg}, \code{mg}, or \code{mgpadj}.
+Specifically, it computes the marginal coefficient for each feature in the dataset and sorts the covariates in decreasing order according to the selected ranking method:
+\code{absmg}, \code{mg}, \code{mgpadj} or \code{mgpval}.
 }
 \details{
 This function implements marginal ranking for the features of a matrix \code{X} based on their association with survival outcomes in \code{y,delta} ,
@@ -47,19 +46,21 @@ using either the Cox Proportional Hazards or Accelerated Failure Time (AFT) mode
 The functions assume that the feature in \code{X}  were already preprocessed to remove irrelevant information and normalized, if necessary.
 Such preprocessing depends on the type of variables encoded in matrix \code{X}.
 Then, it uses the \code{margcoef} function to compute the marginal coefficients for each feature,
-employing several ranking methods (namely,\code{absmg}, \code{mg}, or \code{mgpadj}) based on marginal utility or adjusted p-values.
+employing several ranking methods (namely,\code{absmg}, \code{mg}, \code{mgpadj}, or \code{mgpval}) based on marginal utility or adjusted p-values.
 The \code{margcoef} function, in turn, uses the \code{mg} function to calculate the regression coefficients
 and adjusted p-values, depending on the specified \code{family} (\code{Cox} or \code{AFT}).
 The ranking of the features can be done according to one of the following criteria:
 \itemize{
-\item \code{absmg}: The absolute marginal utility function.
-\item \code{mg}: The marginal utility function.
-\item \code{mgpadj}: The p-value adjusted according with the marginal utility function.
+\item \code{absmg}: It ranks the importance of features according to the absolute value of their marginal regression coefficients.
+\item \code{mg}: It ranks the importance of features according to the magnitude of of their marginal regression coefficients.
+\item \code{mgpadj}: It ranks the importance of features according to the p-value adjusted of their marginal regression coefficients.
+\item \code{mgpval}: It ranks the importance of features according to the value \code{-log10(pval) * abs(beta)}, i.e., p-values and effect size of the marginal regression coefficients.
+
 }
 When choosing \code{mgpadj}, the adjustment method includes the Benjamini and Hochberg (1995) (\code{BH} or its alias \code{fdr}) correction.
 }
 \note{
-Last change 08/04/2025
+Last change 22/04/2026
 }
 \examples{
 \dontrun{

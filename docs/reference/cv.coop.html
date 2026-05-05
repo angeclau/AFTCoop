@@ -19,7 +19,7 @@ minimizing prediction error across folds. It is typically used by function aft_c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">AFTCoop</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4</span>
       </span>
     </div>
 
@@ -108,11 +108,11 @@ minimizing prediction error across folds. It is typically used by function <code
 
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>Logical; whether to use parallel processing (default: TRUE)</p></dd>
+<dd><p>Logical; whether to use parallel processing over cross validation (default: TRUE)</p></dd>
 
 
 <dt id="arg-ncore-max">ncore_max<a class="anchor" aria-label="anchor" href="#arg-ncore-max"></a></dt>
-<dd><p>Maximum number of cores for parallel processing (default: 5)</p></dd>
+<dd><p>Maximum number of cores for parallel processing over cross validation (default: 5)</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
@@ -141,13 +141,11 @@ minimizing prediction error across folds. It is typically used by function <code
 lambda (lambda.1se)</p></li>
 </ul><p>The function requires the cvTools package for fold generation.
 The number of cores used for parallel processing is automatically determined
-based on system availability, number of folds and user-specified maximum.
-Parallel processing implementation differs between Windows (using makeCluster)
-and Unix-like systems (using mclapply).</p>
+based on system availability, number of folds and user-specified maximum.</p>
     </div>
     <div id="note">
     <h2>Note</h2>
-    <p>Last change 25/03/2025</p>
+    <p>Last change 6/03/2026</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -166,7 +164,7 @@ and Unix-like systems (using mclapply).</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="An R package for fitting cooperative AFT survival regression models with two views.">
-<meta property="og:description" content="The AFTCoop package estimates cooperative AFT survival regression models that allow the integration of two matrices of covariates, U and Z, to improve the estimate. It implements the direct cooperative algorithm proposed in Angelini, De Canditiis, De Feis and Iuliano (in preparation 2025). It relies on adding a cooperative term into a penalized negative loglikelihood function to enforce the agreement between the two views representing two multi-omics datasets associated to the same patients, such as gene expression and methylation. The cooperative learning is a novel approach to multi-view data integration iniatially proposed in Ding et al (2022). In this setting, the AFT negative loglikeloood and the LASSO penalization are combined to enforce sparsity, and an agreement penalty is used to encourage the predictions from the two data views to agree while improving the survival estimates. The user can choose between three models: Weibull, lognormal, or log-logistic, which handle different noise distributions in the log-linear AFT representation. The regression coefficient estimates are obtained using the proximal gradient method, and the regularization parameter is chosen using cross-validation.">
+<meta property="og:description" content="The AFTCoop package estimates cooperative AFT survival regression models that allow the integration of two matrices of covariates, U and Z, to improve the estimate. It implements the direct cooperative algorithm proposed in Angelini, De Canditiis, De Feis and Iuliano (submitted 2025). It relies on adding a cooperative term into a penalized negative loglikelihood function to enforce the agreement between the two views representing two multi-omics datasets associated to the same patients, such as gene expression and methylation. The cooperative learning is a novel approach to multi-view data integration initially proposed in Ding et al (2022). In this setting, the AFT negative loglikeloood and the LASSO penalization are combined to enforce sparsity, and an agreement penalty is used to encourage the predictions from the two data views to agree while improving the survival estimates. The user can choose between three models: Weibull, lognormal, or log-logistic, which handle different noise distributions in the log-linear AFT representation. The regression coefficient estimates are obtained using the proximal gradient method, and the regularization parameter is chosen using cross-validation.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">AFTCoop</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4</span>
       </span>
     </div>
 
@@ -65,7 +65,7 @@
 <div class="section level2">
 <h2 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
 </h2>
-<p>The <strong>AFTCoop</strong> package estimates cooperative AFT survival regression models that allow the integration of two matrices of covariates, <strong>U</strong> and <strong>Z</strong>, to improve the estimate. It implements the direct cooperative algorithm proposed in Angelini, De Canditiis, De Feis and Iuliano (in preparation 2025). It relies on adding a cooperative term into a penalized negative log-likelihood function to enforce the agreement between the two views representing two multi-omics datasets associated to the same patients, such as gene expression and methylation. The cooperative learning is a novel approach to multi-view data integration iniatially proposed in Ding et al (2022). In this setting, the AFT negative loglikeloood and the LASSO penalization are combined to enforce sparsity, and an agreement penalty is used to encourage the predictions from the two data views to agree while improving the survival estimates. The user can choose between three models: <em>Weibull</em>, <em>lognormal</em>, or <em>log-logistic</em>, which handle different noise distributions in the log-linear AFT representation. The regression coefficient estimates are obtained using the proximal gradient method, and the regularization parameter is chosen using cross-validation</p>
+<p>The <strong>AFTCoop</strong> package estimates cooperative AFT survival regression models that allow the integration of two matrices of covariates, <strong>U</strong> and <strong>Z</strong>, to improve the estimate. It implements the direct cooperative algorithm proposed in Angelini, De Canditiis, De Feis and Iuliano (Submitted 2025). It relies on adding a cooperative term into a penalized negative log-likelihood function to enforce the agreement between the two views representing two multi-omics datasets associated to the same patients, such as gene expression and methylation. The cooperative learning is a novel approach to multi-view data integration initially proposed in Ding et al (2022). In this setting, the AFT negative loglikeloood and the LASSO penalization are combined to enforce sparsity, and an agreement penalty is used to encourage the predictions from the two data views to agree while improving the survival estimates. The user can choose between three models: <em>Weibull</em>, <em>lognormal</em>, or <em>log-logistic</em>, which handle different noise distributions in the log-linear AFT representation. The regression coefficient estimates are obtained using the proximal gradient method, and the regularization parameter is chosen using cross-validation</p>
 </div>
 <div class="section level2">
 <h2 id="test_tube-installation">🧪 Installation<a class="anchor" aria-label="anchor" href="#test_tube-installation"></a>
@@ -73,12 +73,15 @@
 <p>For now, install the latest version of <strong>AFTCoop</strong> directly from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"angeclau/AFTCoop"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install-deprecated.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"angeclau/AFTCoop"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="books-citation">📚 Citation<a class="anchor" aria-label="anchor" href="#books-citation"></a>
 </h2>
-<p>If you use AFTCoop, please cite: 1. C. Angelini, D. De Canditiis, I. De Feis, A. Iuliano. <em>Cooperative AFT models for multi-omics data integration</em> in preparation (2025)</p>
+<p>If you use AFTCoop, please cite:</p>
+<ol style="list-style-type: decimal">
+<li>C. Angelini, D. De Canditiis, I. De Feis, A. Iuliano. <em>Cooperative AFT models for multi-omics data integration</em> submitted (2025)</li>
+</ol>
 <div class="section level3">
 <h3 id="id_-funding">🏛 Funding<a class="anchor" aria-label="anchor" href="#id_-funding"></a>
 </h3>
@@ -110,8 +113,8 @@
 <ul class="list-unstyled">
 <li>Claudia Angelini <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-8350-8464" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Daniela De Canditiis <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3022-3411" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Italia De Feis <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8350-8464" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Antonella Iuliano <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3022-3411" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Italia De Feis <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3694-8202" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Antonella Iuliano <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8541-8120" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -128,7 +131,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

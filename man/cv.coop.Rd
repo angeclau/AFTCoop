@@ -38,9 +38,9 @@ cv.coop(
 
 \item{model}{Character string specifying the AFT model type. The following choices are available: "weibull";"lognormal";"loglogistic".}
 
-\item{parallel}{Logical; whether to use parallel processing (default: TRUE)}
+\item{parallel}{Logical; whether to use parallel processing over cross validation (default: TRUE)}
 
-\item{ncore_max}{Maximum number of cores for parallel processing (default: 5)}
+\item{ncore_max}{Maximum number of cores for parallel processing over cross validation (default: 5)}
 
 \item{seed}{Random seed for reproducibility (default: 123)}
 }
@@ -79,11 +79,9 @@ lambda (lambda.1se)
 The function requires the cvTools package for fold generation.
 The number of cores used for parallel processing is automatically determined
 based on system availability, number of folds and user-specified maximum.
-Parallel processing implementation differs between Windows (using makeCluster)
-and Unix-like systems (using mclapply).
 }
 \note{
-Last change 25/03/2025
+Last change 6/03/2026
 }
 \seealso{
 \code{\link{aft_coop}} for the main estimation function

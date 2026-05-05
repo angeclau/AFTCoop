@@ -3,16 +3,15 @@
 #' @description
 #' This function performs marginal ranking of features based on their association with the survival outcome
 #' (see, for example, Fan and Lv (2008) and Fan, Feng and Wu (2010)).
-#' Specifically, it computes the marginal coefficient for each feature in the dataset and s
-#' orts the covariates in decreasing order according to the selected ranking method:
-#' \code{absmg}, \code{mg}, or \code{mgpadj}.
+#' Specifically, it computes the marginal coefficient for each feature in the dataset and sorts the covariates in decreasing order according to the selected ranking method:
+#' \code{absmg}, \code{mg}, \code{mgpadj} or \code{mgpval}.
 #'
 #' @param X Matrix of covariates correspondig to the view of dimension \code{n x p_{view}}, where \code{n} is the number of samples and \code{p_{view}} is the number of variables in the view.
 #' @param y Vector of observed survival times in the time-domain or censored times of dimension \code{n}, where \code{n} is the number of samples.
 #' @param delta Vector of censoring indicators (1 for event, 0 for censored) of dimension  \code{n}, where \code{n} is the number of samples.
 #' @param family Character string indicating the type of survival model to fit. Options are \code{cox} for Cox Proportional Hazards model and \code{AFT} for Accelerated Failure Time model.
 #' @param model Character string specifying the specific AFT model to use.  It can assume one of the following values: "weibull";"lognormal";"loglogistic". Ignored if `family = "cox"`.
-#' @param rank Character string specifying the ranking method. It can assume one of the following values: "absmg", "mg" and "mgpadj".
+#' @param rank Character string specifying the ranking method. It can assume one of the following values: \code{absmg}, \code{mg}, \code{mgpadj} and \code{mgpval}.
 #'
 #' @details
 #' This function implements marginal ranking for the features of a matrix \code{X} based on their association with survival outcomes in \code{y,delta} ,
@@ -20,22 +19,24 @@
 #' The functions assume that the feature in \code{X}  were already preprocessed to remove irrelevant information and normalized, if necessary.
 #' Such preprocessing depends on the type of variables encoded in matrix \code{X}.
 #' Then, it uses the \code{margcoef} function to compute the marginal coefficients for each feature,
-#' employing several ranking methods (namely,\code{absmg}, \code{mg}, or \code{mgpadj}) based on marginal utility or adjusted p-values.
+#' employing several ranking methods (namely,\code{absmg}, \code{mg}, \code{mgpadj}, or \code{mgpval}) based on marginal utility or adjusted p-values.
 #' The \code{margcoef} function, in turn, uses the \code{mg} function to calculate the regression coefficients
 #' and adjusted p-values, depending on the specified \code{family} (\code{Cox} or \code{AFT}).
 #' The ranking of the features can be done according to one of the following criteria:
 #' \itemize{
-#' \item \code{absmg}: The absolute marginal utility function.
-#' \item \code{mg}: The marginal utility function.
-#' \item \code{mgpadj}: The p-value adjusted according with the marginal utility function.
+#' \item \code{absmg}: It ranks the importance of features according to the absolute value of their marginal regression coefficients.
+#' \item \code{mg}: It ranks the importance of features according to the magnitude of of their marginal regression coefficients.
+#' \item \code{mgpadj}: It ranks the importance of features according to the p-value adjusted of their marginal regression coefficients.
+#' \item \code{mgpval}: It ranks the importance of features according to the value \code{-log10(pval) * abs(beta)}, i.e., p-values and effect size of the marginal regression coefficients.
+#'
 #' }
 #' When choosing \code{mgpadj}, the adjustment method includes the Benjamini and Hochberg (1995) (\code{BH} or its alias \code{fdr}) correction.
 #'
 #' @return A data frame with the ranked features. The columns include:
 #' \itemize{
-#' \item ranking:  The rank of the feature based on the selected method.
-#' \item symbol: The name of the feature.
-#' \item rank: The ranked marginal utility values using one of several methods: \code{absmg}, \code{mg}, \code{mgpadj}.
+#' \item ranking: The rank of the features according to the ranking method.
+#' \item symbol: The symbol name of the features according to the ranking method.
+#' \item rank: The rank methods: \code{absmg}, \code{mg}, \code{mgpadj}, \code{mgpval}.
 #' }
 #'
 #' @references
@@ -80,21 +81,19 @@
 #' print(screening_U)
 #'}
 #'
-#' @import survival
+#' @importFrom survival Surv coxph survreg
 #' @importFrom broom tidy
 #'
-#' @note Last change 08/04/2025
+#' @note Last change 22/04/2026
 #' @export
 
-marginal_ranking <- function(X, y, delta, family=c("cox","AFT"), model =  c("weibull", "exponential", "lognormal","loglogistic"), rank = c("absmg", "mg", "mgpadj")){
-
-  library(survival)
+marginal_ranking <- function(X, y, delta, family=c("cox","AFT"), model =  c("weibull", "exponential", "lognormal","loglogistic"), rank = c("absmg", "mg", "mgpadj", "mgpval")){
 
   n <- nrow(X)
   p <- ncol(X)
 
   # survival data
-  y_surv <- Surv(y,delta)
+  y_surv <- survival::Surv(y,delta)
 
   # Standardizes the columns of a high-dimensional design matrix to mean zero and unit Euclidean norm
   center <- colMeans(X)
@@ -121,17 +120,23 @@ margcoef <- function(X, y, condind = NULL, family, null.model = FALSE, model, ra
   p <- ncol(X)
   candind <- setdiff(1:p, condind)
 
-  if(rank=="absmg"){
+  if(rank == "absmg"){
     res <- abs(sapply(candind, mg, X, y, family, condind, model))
   }
 
-  if(rank=="mg"){
+  if(rank == "mg"){
    res <- sapply(candind, mg, X, y, family, condind, model)
   }
 
-  if(rank=="mgpadj"){
+  if(rank == "mgpadj"){
     pvalue <- sapply(candind, pval, X, y, family, condind, model)
     res <- p.adjust(pvalue, method = "fdr", n = length(pvalue))
+  }
+
+  if(rank == "mgpval"){
+    mg <- sapply(candind, mg, X, y, family, condind, model)
+    pval <- sapply(candind, pval, X, y, family, condind, model)
+    res <- -log10(pval) * abs(mg)
   }
 
   return(res)
@@ -142,15 +147,15 @@ margcoef <- function(X, y, condind = NULL, family, null.model = FALSE, model, ra
 # Return the regression coefficients for the Cox and AFT model fittings
 mg <- function(index, X = X, y = y, family = family, condind = condind, dist = model) {
   margfit <- switch(family,
-                    cox = coef(coxph(y ~ cbind(X[,index], X[,condind])))[1],
-                    AFT = coef(survreg(y ~ cbind(X[,index], X[,condind]), dist = model))[2])
+                    cox = coef(survival::coxph(y ~ cbind(X[,index], X[,condind])))[1],
+                    AFT = coef(survival::survreg(y ~ cbind(X[,index], X[,condind]), dist = model))[2])
 }
 
 # Return the p-values associated with the regression coefficients for the Cox and AFT model fittings
 pval <- function(index, X = X, y = y, family = family, condind = condind, dist = model) {
   pvalfit <- switch(family,
-                    cox = broom::tidy(coxph(y ~ cbind(X[,index], X[,condind])))$p.value,
-                    AFT = broom::tidy(survreg(y ~ cbind(X[,index], X[,condind]), dist = model))$p.value[2]
+                    cox = broom::tidy(survival::coxph(y ~ cbind(X[,index], X[,condind])))$p.value,
+                    AFT = broom::tidy(survival::survreg(y ~ cbind(X[,index], X[,condind]), dist = model))$p.value[2]
                     )
 }
 

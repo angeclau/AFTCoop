@@ -11,10 +11,10 @@
 #' However, the function works also with a single matrix  \code{U} or \code{Z}.
 #' In such cases, it performs negative log-likelihood minimization with the Lasso penalty.
 #' In both cases, cross-validation estimates the regularization parameter.
-#' The function supports parallel processing and cross-validation for optimal parameter selection.
+#' The function supports parallel processing and cross-validation for optimal parameter selection (see details).
 #'
-#' @param U Matrix of covariates correspondig to the first view (e.g., gene expression) of dimension \code{n x p_u}, where \code{n} is the number of samples and \code{p_u} is the number of variables in the first view.
-#' @param Z Matrix of covariates correspondig to the second view (e.g., gene methylation) of dimension \code{n x p_z},where \code{n} is the number of samples and \code{p_z} is the number of variables in the second view.
+#' @param U Matrix of covariates corresponding to the first view (e.g., gene expression) of dimension \code{n x p_u}, where \code{n} is the number of samples and \code{p_u} is the number of variables in the first view.
+#' @param Z Matrix of covariates corresponding to the second view (e.g., gene methylation) of dimension \code{n x p_z},where \code{n} is the number of samples and \code{p_z} is the number of variables in the second view.
 #' @param Y Vector of log observed survival times or log censored times (i.e., the response variables are in log scale) of dimension \code{n}, where \code{n} is the number of samples.
 #' @param delta Vector of censoring indicators (1 for event, 0 for censored) of dimension  \code{n}, where \code{n} is the number of samples.
 #' @param sigma Scale parameter for the AFT model (it must be a positive real value).
@@ -27,7 +27,8 @@
 #' @param lam_min Logical; if TRUE uses lambda.min, if FALSE uses lambda.1se
 #' @param nlambda Number of lambda values in regularization path (default: 100)
 #' @param lambda.ratio.min Minimum ratio of smallest to largest lambda (default: 0.01)
-#' @param parallel Logical; enable parallel processing (default: TRUE)
+#' @param parallel.rho Logical; enable parallel processing over rho (default: TRUE)
+#' @param parallel.cv Logical; enable parallel processing over cv (default: TRUE)
 #' @param ncore_max_rho Maximum number of cores for parallel processing for splitting over rho_values (default: 4)
 #' @param ncore_max_cv Maximum number of cores for parallel processing for splitting over Cross-validation (default: 5)
 #' @param seed Random seed for reproducibility (default: 123)
@@ -48,15 +49,19 @@
 #'       \item Rescales coefficients back to original scale
 #'     }
 #' }
-#' The function uses standardized variables internally but returns coefficients
+#'
+#' The function uses standardized variables internally, but returns coefficients
 #' in the original scale. Cross-validation is used to select optimal lambda values.
 #' The user can choose the optimal value for lambda as lambda.min (i.e., the values of lambda for which the CV is minimised)
-#' or lambda.1se (i.e, the largests value of lambda within 1 standard error form the the minumum).
-#' The latter choice provides a sparsest model.
-#' The choice of the type of optimal value to use is done setting the logical lam_min parameter.
-#' However, we switch between  lambda.min  and lambda.1se is the correspondoing values is at the boarder of the grid interval.
-#' Parallel processing implementation differs between Windows (using makeCluster)
-#' and Unix-like systems (using mclapply).
+#' or lambda.1se (i.e, the largest value of lambda within 1 standard error from the minimum).
+#' The latter choice provides the sparsest model.
+#' The choice of the type of optimal value to use is done by setting the logical lam_min parameter.
+#' However, we switch between lambda.min  and lambda.1se, the corresponding values are at the border of the grid interval.
+#'
+#' With version 0.2.3., the parallel processing implementation is unified for macOS / Linux / Windows.
+#' It uses the R package \code{\link{parallel}} and supports the nested parallelization over rho and cross-validation.
+#' However, for Apple Silicon processor, we find that the nested parallelism might be unstable with R>= 4.5.2
+#' due to the internal multithreading of the numerical libraries. In such a case, we suggest setting parallel.cv to FALSE.
 #'
 #' @return
 #' A matrix of dimension \code{(p_u+p_z)x nrhos},where:
@@ -69,7 +74,7 @@
 #'
 #'
 #' @references
-#' Angelini, De Canditiis, De Feis, Iuliano (in prep. 2025).
+#' Angelini, De Canditiis, De Feis, Iuliano (submitted. 2025).
 #'
 #' Ding, Li, Narasimhan, Tibshirani, "Cooperative learning for multiview analysis", PNAS (2022)
 #' DOI: 10.1073/pnas.220211311
@@ -110,8 +115,6 @@
 #'     case="coop",
 #'     rho_values=  rho_values,
 #'     lam_min=F,
-#'     parallel=T,
-#'     ncore_max=5,
 #'     seed=123)
 #'
 #'    ## estimate of beta  (the first pu components refers to the view U; The second pz component to view Z  )
@@ -129,8 +132,6 @@
 #'     case="onlyU",
 #'     rho_values=  1,
 #'     lam_min=F,
-#'     parallel=T,
-#'     ncore_max=5,
 #'     seed=123)
 #'
 #'
@@ -146,8 +147,6 @@
 #'     case="onlyZ",
 #'     rho_values=  1,
 #'     lam_min=F,
-#'     parallel=T,
-#'     ncore_max=5,
 #'     seed=123)
 #'
 #'     beta_est_onlyZ
@@ -161,14 +160,13 @@
 #' @seealso
 #' \code{\link{cv.coop}} for underlying implementation details
 #'
-#' @note Last change 15/04/2025
+#' @note Last change 09/03/2026
 #' @export
 
-
 aft_coop <- function(U, Z, Y, delta, sigma, nfolds=5, model, case, rho_values,
-                         lam_min, nlambda = 100, lambda.ratio.min = 0.01, parallel = TRUE,
-                         ncore_max_rho = 4,ncore_max_cv=5, seed = 123, iplot=T,addbar=F) {
-
+                     lam_min, nlambda = 100, lambda.ratio.min = 0.01,
+                     parallel.rho = TRUE,parallel.cv=TRUE,
+                     ncore_max_rho = 4,ncore_max_cv=5, seed = 123, iplot=T,addbar=F) {
 
   set.seed(seed)
   library(parallel)
@@ -187,11 +185,11 @@ aft_coop <- function(U, Z, Y, delta, sigma, nfolds=5, model, case, rho_values,
   if (!is.logical(lam_min)) stop("lam_min must be a logical value.")
   if (!is.numeric(nlambda) || nlambda <= 0 || nlambda != round(nlambda)) stop("nlambda must be a positive integer.")
   if (!is.numeric(lambda.ratio.min) || lambda.ratio.min <= 0 || lambda.ratio.min >= 1) stop("lambda.ratio.min must be a number between 0 and 1.")
-  if (!is.logical(parallel)) stop("parallel must be a logical value.")
+  if (!is.logical(parallel.rho)) stop("parallel must be a logical value.")
+  if (!is.logical(parallel.cv)) stop("parallel must be a logical value.")
   if (!is.numeric(ncore_max_rho) || ncore_max_rho <= 0 || ncore_max_rho != round(ncore_max_rho)) stop("ncore_max_rho must be a positive integer.")
   if (!is.numeric(ncore_max_cv) || ncore_max_cv <= 0 || ncore_max_cv != round(ncore_max_cv)) stop("ncore_max_cv must be a positive integer.")
   if (!is.numeric(seed) || seed != round(seed)) stop("seed must be an integer.")
-
 
   # Set Dimensions
   pu <- ncol(U)
@@ -225,6 +223,7 @@ aft_coop <- function(U, Z, Y, delta, sigma, nfolds=5, model, case, rho_values,
     Xtilde_std <- cbind(U_std_res$std, -Z_std_res$std)
   }
 
+
   # Initialize and Compute lambda grid
   beta0 <- rep(0, p)
   eta <- X_std %*% beta0
@@ -240,64 +239,89 @@ aft_coop <- function(U, Z, Y, delta, sigma, nfolds=5, model, case, rho_values,
   # Output matrix
   beta_est <- matrix(0, nrow = p, ncol = n_rho_values)
 
-  # Parallel processing
+  # Function for (Parallel) processing over rho
   process_rho <- function(rho) {
-      lambda_max <- max(abs(grad_beta))/rho
-      lambda_min <- lambda.ratio.min * lambda_max
-      lambda_grid <- exp(seq(log(lambda_max),log(lambda_min),length.out=nlambda))
-      cv_out <- cv.coop(X, Xtilde, Y, delta, sigma, lambda = lambda_grid, rho, nfolds =nfolds, model=model,
-                          parallel=parallel, ncore_max = ncore_max_cv, seed = seed + round(100 * rho))
 
-## we avoid to take lambda equal to lambda_min or lambda_max
-if (lam_min) {
-   if (cv_out$lambda.min> lambda_min ){
-     lambda <- cv_out$lambda.min
-   } else {lambda <-cv_out$lambda.1se }
- } else {
-   if (cv_out$lambda.1se<lambda_max){
-     lambda <-cv_out$lambda.1se
-  }    else {lambda <-cv_out$lambda.min}
-}
+    lambda_max <- max(abs(grad_beta))/rho
+    lambda_min <- lambda.ratio.min * lambda_max
+    lambda_grid <- exp(seq(log(lambda_max),log(lambda_min),length.out=nlambda))
+
+    cv_out <- cv.coop(
+      X, Xtilde, Y, delta, sigma,
+      lambda=lambda_grid, rho,
+      nfolds=nfolds, model=model,
+      parallel=parallel.cv,
+      ncore_max=ncore_max_cv,
+      seed=seed + round(100 * rho)
+    )
+
+  ## we avoid to take lambda equal to lambda_min or lambda_max
+    if (lam_min) {
+      if (cv_out$lambda.min > lambda_min) {
+        lambda <- cv_out$lambda.min
+      } else {
+        lambda <- cv_out$lambda.1se
+      }
+    } else {
+      if (cv_out$lambda.1se < lambda_max) {
+        lambda <- cv_out$lambda.1se
+      } else {
+        lambda <- cv_out$lambda.min
+      }
+    }
 
     out <- proxGD.coop(X_std, Y, delta, coop, beta0, sigma, rho, lambda, model)
-    res_beta<-out$beta / if (case == "onlyU") U_std_res$sds else if (case == "onlyZ") Z_std_res$sds else c(U_std_res$sds, Z_std_res$sds)
-    res<-list(beta=res_beta,cv_out= cv_out)
-    return(res)
+
+    res_beta <- out$beta /
+      if (case == "onlyU") U_std_res$sds
+    else if (case == "onlyZ") Z_std_res$sds
+    else c(U_std_res$sds, Z_std_res$sds)
+
+    list(beta=res_beta, cv_out=cv_out)
   }
 
-  if (parallel && length(rho_values) > 1) {
-    ncores <- min(detectCores() - 1, length(rho_values), ncore_max_rho)
+  ncores <- min(detectCores()-1, length(rho_values), ncore_max_rho)
 
-      all_results <- if (.Platform$OS.type == "windows") {
-      cl <- makeCluster(ncores)
-      sdU=U_std_res$sds
-      sdZ=Z_std_res$sds
-      clusterExport(cl, varlist = c("cv.coop", "proxGD.coop","cv.aftcoop_fold","nll","gradient","hessian_coop","prox.l1",
-                                    "X", "Xtilde", "Y", "delta", "sigma", "grad_beta", "model","nfolds", "parallel","seed", "lambda.ratio.min","nlambda",
-                                    "case", "sdU", "sdZ","coop","ncore_max_cv"), envir = environment())
-      results <- parLapply(cl, rho_values, process_rho)
-      stopCluster(cl)
-      results
-    } else {
-      mclapply(rho_values, process_rho, mc.cores = ncores)
-    }
+  if (parallel.rho && ncores > 1) {
+   # print("Running in parallel mode")
+    cl <- makeCluster(ncores)
 
-    for (jj in 1:length(all_results)){
-      beta_est[,jj]<-all_results[[jj]]$beta
-      cv.out<-all_results[[jj]]$cv_out
-      if (iplot==T){
-        plot_aft_coop.cv(cv.out,nfolds,case,addbar)
-      }
-    }
+    sdU <- U_std_res$sds
+    sdZ <- Z_std_res$sds
+
+    clusterExport(
+      cl,
+      varlist = c(
+        "cv.coop","proxGD.coop","cv.aftcoop_fold",
+        "nll","gradient","hessian_coop","prox.l1",
+        "X","Xtilde","Y","delta","sigma","grad_beta",
+        "model","nfolds","parallel.cv","seed",
+        "lambda.ratio.min","nlambda","case",
+        "sdU","sdZ","coop","ncore_max_cv","process_rho"
+      ),
+      envir = environment()
+    )
+
+    all_results <- parLapply(cl, rho_values, process_rho)
+
+    stopCluster(cl)
+
   } else {
-    for (i in seq_along(rho_values)) {
-      all_results<- process_rho(rho_values[i])
-      beta_est[, i] <-all_results$beta
-      cv.out<-all_results$cv_out
-      if (iplot==T){
-        plot_aft_coop.cv(cv.out,nfolds,case,addbar)
-      }
-    }
+   # print("Running in Sequential mode")
+    all_results <- lapply(rho_values, process_rho)
+
   }
+
+  for (jj in seq_along(all_results)) {
+
+    beta_est[,jj] <- all_results[[jj]]$beta
+    cv.out <- all_results[[jj]]$cv_out
+
+    if (iplot==TRUE) {
+      plot_aft_coop.cv(cv.out,nfolds,case,addbar)
+    }
+
+  }
+
   return(beta_est)
 }

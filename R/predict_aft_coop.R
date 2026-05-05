@@ -36,47 +36,45 @@
 #' set.seed(123)
 #' model="weibull"
 #' data <- generate_data(
-#'   model = model,
-#'     n = 200,
-#'     pu = 150,
-#'     pz = 150,
-#'     tu = 6,
-#'     tz = 6,
-#'     rate = 40,
-#'     sigma_true = 0.5
-#'     )
+#'  model = model,
+#'  n = 200,
+#'  pu = 150,
+#'  pz = 150,
+#'  tu = 6,
+#'  tz = 6,
+#'  rate = 40,
+#'  sigma_true = 0.5
+#' )
 #'
-#'     Y <- data$Y  # vector of log survival times or censored times
-#'     delta <- data$delta  # vector of censoring indicators
-#'     U <- data$U  # matrix corresponding to the first view
-#'     Z <- data$Z  # matrix corresponding to the second view
-#'     fit_survreg <- survreg(Surv(data$times_c, delta)~1, dist=model,scale=0)
-#'     sigma.est <- exp(fit_survreg$icoef[2])
-#'     rho_values<- c(1,0,0.25,0.5,0.75) #vector parameteters for rho values
-#' # Using aft_coop with two views
-#'     beta_est_coop<-aft_coop(
-#'     U=U,
-#'     Z=Z,
-#'     Y=Y,
-#'     delta=delta,
-#'     sigma=sigma.est,
-#'     nfolds=5,
-#'     model=model,
-#'     case="coop",
-#'     rho_values=  rho_values,
-#'     lam_min=F,
-#'     parallel=T,
-#'     ncore_max=5,
-#'     seed=123)
-#'
-#'    ## estimate of beta  (the first pu components refers to the view U; The second pz component to view Z  )
-#'    beta_est_coop
+#' Y <- data$Y  # vector of log survival times or censored times
+#' delta <- data$delta  # vector of censoring indicators
+#' U <- data$U  # matrix corresponding to the first view
+#' Z <- data$Z  # matrix corresponding to the second view
+#' fit_survreg <- survreg(Surv(data$times_c, delta)~1, dist=model,scale=0)
+#' sigma.est <- exp(fit_survreg$icoef[2])
+#' rho_values<- c(1,0.25,0.5,0.75) #vector parameteters for rho values
+
+# Using aft_coop with two views
+#'mbeta_est_coop<-aft_coop(
+#'  U=U,
+#'  Z=Z,
+#'  Y=Y,
+#'  delta=delta,
+#'  sigma=sigma.est,
+#'  nfolds=5,
+#'  model=model,
+#'  case="coop",
+#'  rho_values=  rho_values,
+#'  lam_min=F,
+#'  seed=123)
+#' ## here in estimate of beta  (the first pu components refers to the view U; The second pz component to view Z  )
+#' beta_est_coop
 #' ## linear prediction using the estimated coefficients corresponding to the first value of rho_values
 #' lin.pred<- predict_aft_coop(U=U, Z=Z, beta=beta_est_coop[,1], case = "coop")
 #' print(lin.pred)  # Predicted values based on combined data
-#' #' }
+#' }
 #'
-#' @note Last change 11/03/2025
+#' @note Last change 06/03/2026
 #' @export
 #'
 predict_aft_coop <- function(U, Z, mU=NULL, mZ=NULL,beta, case=c("onlyU", "onlyZ","coop")){

@@ -229,8 +229,8 @@ generate_data <- function(model,n,pu,pz,tu,tz,rate=40,sigma_true,rl=40,rl_pos=20
     }
   }
 
-  print(paste0("percentage not censored=",length(which(delta==1))/n))
-  print(summary(times_c))
+  #print(paste0("percentage not censored=",length(which(delta==1))/n))
+  #print(summary(times_c))
 #  plot(times_c)
 
   Y<-log(times_c) ## times Y are already in log scale; times_c are in linear scale

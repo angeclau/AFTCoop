@@ -9,7 +9,7 @@ and the Lasso penalization for each view.
 However, the function works also with a single matrix  U or Z.
 In such cases, it performs negative log-likelihood minimization with the Lasso penalty.
 In both cases, cross-validation estimates the regularization parameter.
-The function supports parallel processing and cross-validation for optimal parameter selection."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
+The function supports parallel processing and cross-validation for optimal parameter selection (see details)."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
@@ -27,7 +27,7 @@ The function supports parallel processing and cross-validation for optimal param
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">AFTCoop</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4</span>
       </span>
     </div>
 
@@ -63,7 +63,7 @@ and the Lasso penalization for each view.
 However, the function works also with a single matrix  <code>U</code> or <code>Z</code>.
 In such cases, it performs negative log-likelihood minimization with the Lasso penalty.
 In both cases, cross-validation estimates the regularization parameter.
-The function supports parallel processing and cross-validation for optimal parameter selection.</p>
+The function supports parallel processing and cross-validation for optimal parameter selection (see details).</p>
     </div>
 
     <div id="ref-usage">
@@ -80,7 +80,8 @@ The function supports parallel processing and cross-validation for optimal param
 <span>  <span class="va">lam_min</span>,</span>
 <span>  nlambda <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  lambda.ratio.min <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  parallel.rho <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  parallel.cv <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ncore_max_rho <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  ncore_max_cv <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">123</span>,</span>
@@ -94,11 +95,11 @@ The function supports parallel processing and cross-validation for optimal param
 
 
 <dl><dt id="arg-u">U<a class="anchor" aria-label="anchor" href="#arg-u"></a></dt>
-<dd><p>Matrix of covariates correspondig to the first view (e.g., gene expression) of dimension <code>n x p_u</code>, where <code>n</code> is the number of samples and <code>p_u</code> is the number of variables in the first view.</p></dd>
+<dd><p>Matrix of covariates corresponding to the first view (e.g., gene expression) of dimension <code>n x p_u</code>, where <code>n</code> is the number of samples and <code>p_u</code> is the number of variables in the first view.</p></dd>
 
 
 <dt id="arg-z">Z<a class="anchor" aria-label="anchor" href="#arg-z"></a></dt>
-<dd><p>Matrix of covariates correspondig to the second view (e.g., gene methylation) of dimension <code>n x p_z</code>,where <code>n</code> is the number of samples and <code>p_z</code> is the number of variables in the second view.</p></dd>
+<dd><p>Matrix of covariates corresponding to the second view (e.g., gene methylation) of dimension <code>n x p_z</code>,where <code>n</code> is the number of samples and <code>p_z</code> is the number of variables in the second view.</p></dd>
 
 
 <dt id="arg-y">Y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
@@ -143,8 +144,12 @@ The choice "onlyZ" uses only the second view of covariates, The choice "coop" us
 <dd><p>Minimum ratio of smallest to largest lambda (default: 0.01)</p></dd>
 
 
-<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>Logical; enable parallel processing (default: TRUE)</p></dd>
+<dt id="arg-parallel-rho">parallel.rho<a class="anchor" aria-label="anchor" href="#arg-parallel-rho"></a></dt>
+<dd><p>Logical; enable parallel processing over rho (default: TRUE)</p></dd>
+
+
+<dt id="arg-parallel-cv">parallel.cv<a class="anchor" aria-label="anchor" href="#arg-parallel-cv"></a></dt>
+<dd><p>Logical; enable parallel processing over cv (default: TRUE)</p></dd>
 
 
 <dt id="arg-ncore-max-rho">ncore_max_rho<a class="anchor" aria-label="anchor" href="#arg-ncore-max-rho"></a></dt>
@@ -184,23 +189,25 @@ The first set of coefficients corresponds \(\hat{\beta}_u\) to those associated 
 <li><p>Applies proximal gradient descent</p></li>
 <li><p>Rescales coefficients back to original scale</p></li>
 </ul></li>
-</ul><p>The function uses standardized variables internally but returns coefficients
+</ul><p>The function uses standardized variables internally, but returns coefficients
 in the original scale. Cross-validation is used to select optimal lambda values.
 The user can choose the optimal value for lambda as lambda.min (i.e., the values of lambda for which the CV is minimised)
-or lambda.1se (i.e, the largests value of lambda within 1 standard error form the the minumum).
-The latter choice provides a sparsest model.
-The choice of the type of optimal value to use is done setting the logical lam_min parameter.
-However, we switch between  lambda.min  and lambda.1se is the correspondoing values is at the boarder of the grid interval.
-Parallel processing implementation differs between Windows (using makeCluster)
-and Unix-like systems (using mclapply).</p>
+or lambda.1se (i.e, the largest value of lambda within 1 standard error from the minimum).
+The latter choice provides the sparsest model.
+The choice of the type of optimal value to use is done by setting the logical lam_min parameter.
+However, we switch between lambda.min  and lambda.1se, the corresponding values are at the border of the grid interval.</p>
+<p>With version 0.2.3., the parallel processing implementation is unified for macOS / Linux / Windows.
+It uses the R package <code>parallel</code> and supports the nested parallelization over rho and cross-validation.
+However, for Apple Silicon processor, we find that the nested parallelism might be unstable with R&gt;= 4.5.2
+due to the internal multithreading of the numerical libraries. In such a case, we suggest setting parallel.cv to FALSE.</p>
     </div>
     <div id="note">
     <h2>Note</h2>
-    <p>Last change 15/04/2025</p>
+    <p>Last change 09/03/2026</p>
     </div>
     <div id="references">
     <h2>References</h2>
-    <p>Angelini, De Canditiis, De Feis, Iuliano (in prep. 2025).</p>
+    <p>Angelini, De Canditiis, De Feis, Iuliano (submitted. 2025).</p>
 <p>Ding, Li, Narasimhan, Tibshirani, "Cooperative learning for multiview analysis", PNAS (2022)
 DOI: 10.1073/pnas.220211311
 Available at: <a href="https://www.pnas.org/doi/abs/10.1073/pnas.2202113119" class="external-link">https://www.pnas.org/doi/abs/10.1073/pnas.2202113119</a></p>
@@ -246,8 +253,6 @@ Available at: <a href="https://www.pnas.org/doi/abs/10.1073/pnas.2202113119" cla
 <span class="r-in"><span>    case<span class="op">=</span><span class="st">"coop"</span>,</span></span>
 <span class="r-in"><span>    rho_values<span class="op">=</span>  <span class="va">rho_values</span>,</span></span>
 <span class="r-in"><span>    lam_min<span class="op">=</span><span class="cn">F</span>,</span></span>
-<span class="r-in"><span>    parallel<span class="op">=</span><span class="cn">T</span>,</span></span>
-<span class="r-in"><span>    ncore_max<span class="op">=</span><span class="fl">5</span>,</span></span>
 <span class="r-in"><span>    seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>   <span class="co">## estimate of beta  (the first pu components refers to the view U; The second pz component to view Z  )</span></span></span>
@@ -265,8 +270,6 @@ Available at: <a href="https://www.pnas.org/doi/abs/10.1073/pnas.2202113119" cla
 <span class="r-in"><span>    case<span class="op">=</span><span class="st">"onlyU"</span>,</span></span>
 <span class="r-in"><span>    rho_values<span class="op">=</span>  <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>    lam_min<span class="op">=</span><span class="cn">F</span>,</span></span>
-<span class="r-in"><span>    parallel<span class="op">=</span><span class="cn">T</span>,</span></span>
-<span class="r-in"><span>    ncore_max<span class="op">=</span><span class="fl">5</span>,</span></span>
 <span class="r-in"><span>    seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
@@ -282,8 +285,6 @@ Available at: <a href="https://www.pnas.org/doi/abs/10.1073/pnas.2202113119" cla
 <span class="r-in"><span>    case<span class="op">=</span><span class="st">"onlyZ"</span>,</span></span>
 <span class="r-in"><span>    rho_values<span class="op">=</span>  <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>    lam_min<span class="op">=</span><span class="cn">F</span>,</span></span>
-<span class="r-in"><span>    parallel<span class="op">=</span><span class="cn">T</span>,</span></span>
-<span class="r-in"><span>    ncore_max<span class="op">=</span><span class="fl">5</span>,</span></span>
 <span class="r-in"><span>    seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>    <span class="va">beta_est_onlyZ</span></span></span>
@@ -304,7 +305,7 @@ Available at: <a href="https://www.pnas.org/doi/abs/10.1073/pnas.2202113119" cla
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

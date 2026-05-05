@@ -17,7 +17,8 @@ aft_coop(
   lam_min,
   nlambda = 100,
   lambda.ratio.min = 0.01,
-  parallel = TRUE,
+  parallel.rho = TRUE,
+  parallel.cv = TRUE,
   ncore_max_rho = 4,
   ncore_max_cv = 5,
   seed = 123,
@@ -26,9 +27,9 @@ aft_coop(
 )
 }
 \arguments{
-\item{U}{Matrix of covariates correspondig to the first view (e.g., gene expression) of dimension \code{n x p_u}, where \code{n} is the number of samples and \code{p_u} is the number of variables in the first view.}
+\item{U}{Matrix of covariates corresponding to the first view (e.g., gene expression) of dimension \code{n x p_u}, where \code{n} is the number of samples and \code{p_u} is the number of variables in the first view.}
 
-\item{Z}{Matrix of covariates correspondig to the second view (e.g., gene methylation) of dimension \code{n x p_z},where \code{n} is the number of samples and \code{p_z} is the number of variables in the second view.}
+\item{Z}{Matrix of covariates corresponding to the second view (e.g., gene methylation) of dimension \code{n x p_z},where \code{n} is the number of samples and \code{p_z} is the number of variables in the second view.}
 
 \item{Y}{Vector of log observed survival times or log censored times (i.e., the response variables are in log scale) of dimension \code{n}, where \code{n} is the number of samples.}
 
@@ -52,7 +53,9 @@ The choice "onlyZ" uses only the second view of covariates, The choice "coop" us
 
 \item{lambda.ratio.min}{Minimum ratio of smallest to largest lambda (default: 0.01)}
 
-\item{parallel}{Logical; enable parallel processing (default: TRUE)}
+\item{parallel.rho}{Logical; enable parallel processing over rho (default: TRUE)}
+
+\item{parallel.cv}{Logical; enable parallel processing over cv (default: TRUE)}
 
 \item{ncore_max_rho}{Maximum number of cores for parallel processing for splitting over rho_values (default: 4)}
 
@@ -84,7 +87,7 @@ and the Lasso penalization for each view.
 However, the function works also with a single matrix  \code{U} or \code{Z}.
 In such cases, it performs negative log-likelihood minimization with the Lasso penalty.
 In both cases, cross-validation estimates the regularization parameter.
-The function supports parallel processing and cross-validation for optimal parameter selection.
+The function supports parallel processing and cross-validation for optimal parameter selection (see details).
 }
 \details{
 When providing two matrices \code{U} and \code{Z}, the function aft_coop performs the following steps:
@@ -100,18 +103,22 @@ When providing two matrices \code{U} and \code{Z}, the function aft_coop perform
 \item Rescales coefficients back to original scale
 }
 }
-The function uses standardized variables internally but returns coefficients
+
+The function uses standardized variables internally, but returns coefficients
 in the original scale. Cross-validation is used to select optimal lambda values.
 The user can choose the optimal value for lambda as lambda.min (i.e., the values of lambda for which the CV is minimised)
-or lambda.1se (i.e, the largests value of lambda within 1 standard error form the the minumum).
-The latter choice provides a sparsest model.
-The choice of the type of optimal value to use is done setting the logical lam_min parameter.
-However, we switch between  lambda.min  and lambda.1se is the correspondoing values is at the boarder of the grid interval.
-Parallel processing implementation differs between Windows (using makeCluster)
-and Unix-like systems (using mclapply).
+or lambda.1se (i.e, the largest value of lambda within 1 standard error from the minimum).
+The latter choice provides the sparsest model.
+The choice of the type of optimal value to use is done by setting the logical lam_min parameter.
+However, we switch between lambda.min  and lambda.1se, the corresponding values are at the border of the grid interval.
+
+With version 0.2.3., the parallel processing implementation is unified for macOS / Linux / Windows.
+It uses the R package \code{\link{parallel}} and supports the nested parallelization over rho and cross-validation.
+However, for Apple Silicon processor, we find that the nested parallelism might be unstable with R>= 4.5.2
+due to the internal multithreading of the numerical libraries. In such a case, we suggest setting parallel.cv to FALSE.
 }
 \note{
-Last change 15/04/2025
+Last change 09/03/2026
 }
 \examples{
 \dontrun{
@@ -148,8 +155,6 @@ data <- generate_data(
     case="coop",
     rho_values=  rho_values,
     lam_min=F,
-    parallel=T,
-    ncore_max=5,
     seed=123)
 
    ## estimate of beta  (the first pu components refers to the view U; The second pz component to view Z  )
@@ -167,8 +172,6 @@ data <- generate_data(
     case="onlyU",
     rho_values=  1,
     lam_min=F,
-    parallel=T,
-    ncore_max=5,
     seed=123)
 
 
@@ -184,8 +187,6 @@ data <- generate_data(
     case="onlyZ",
     rho_values=  1,
     lam_min=F,
-    parallel=T,
-    ncore_max=5,
     seed=123)
 
     beta_est_onlyZ
@@ -194,7 +195,7 @@ data <- generate_data(
 
 }
 \references{
-Angelini, De Canditiis, De Feis, Iuliano (in prep. 2025).
+Angelini, De Canditiis, De Feis, Iuliano (submitted. 2025).
 
 Ding, Li, Narasimhan, Tibshirani, "Cooperative learning for multiview analysis", PNAS (2022)
 DOI: 10.1073/pnas.220211311
