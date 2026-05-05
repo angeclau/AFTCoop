@@ -28,6 +28,13 @@ install.packages("devtools")
 devtools::install_github("angeclau/AFTCoop")
 ```
 
+In alternative, since  `install_github()` was deprecated in devtools 2.5., you can alse install **AFTCoop** using 
+
+```r
+install.packages("pak")
+pak::pak("angeclau/AFTCoop")
+```
+
 ## 📚 Citation
 If you use AFTCoop, please cite:
 
